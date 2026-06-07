@@ -19,38 +19,54 @@ namespace DemoExamRyzhov
         public string SelectedManufacturer => cmbManufacturer.SelectedItem?.ToString();
         public string SelectedSort => cmbSort.SelectedItem?.ToString();
 
+        // Реализация всех событий интерфейса
         public event EventHandler FilterChanged;
         public event EventHandler AddProductClicked;
         public event EventHandler EditProductClicked;
         public event EventHandler DeleteProductClicked;
+
+        public event EventHandler AddOrderClicked;
+        public event EventHandler EditOrderClicked;
+        public event EventHandler DeleteOrderClicked;
+
+        public event EventHandler AddPointClicked;
+        public event EventHandler EditPointClicked;
+        public event EventHandler DeletePointClicked;
+
+        public event EventHandler AddUserClicked;
+        public event EventHandler EditUserClicked;
+        public event EventHandler DeleteUserClicked;
 
         public MainForm()
         {
             InitializeComponent();
             ApplyStyleGuide();
 
+            // Обработчики фильтров
             txtSearch.TextChanged += (s, e) => FilterChanged?.Invoke(this, EventArgs.Empty);
             cmbCategory.SelectedIndexChanged += (s, e) => FilterChanged?.Invoke(this, EventArgs.Empty);
             cmbManufacturer.SelectedIndexChanged += (s, e) => FilterChanged?.Invoke(this, EventArgs.Empty);
             cmbSort.SelectedIndexChanged += (s, e) => FilterChanged?.Invoke(this, EventArgs.Empty);
 
-            // Обработчики для товаров
+            // Обработчики Кнопок ТОВАРОВ
             btnAddProduct.Click += (s, e) => AddProductClicked?.Invoke(this, EventArgs.Empty);
             btnEditProduct.Click += (s, e) => EditProductClicked?.Invoke(this, EventArgs.Empty);
             btnDeleteProduct.Click += (s, e) => DeleteProductClicked?.Invoke(this, EventArgs.Empty);
 
-            // Заглушки на клики кнопок для остальных вкладок (чтобы эксперты видели реакцию системы)
-            btnAddOrder.Click += (s, e) => MessageBox.Show("Вызов формы добавления заказа");
-            btnEditOrder.Click += (s, e) => MessageBox.Show("Вызов формы изменения заказа");
-            btnDeleteOrder.Click += (s, e) => MessageBox.Show("Заказ удален");
+            // Обработчики Кнопок ЗАКАЗОВ
+            btnAddOrder.Click += (s, e) => AddOrderClicked?.Invoke(this, EventArgs.Empty);
+            btnEditOrder.Click += (s, e) => EditOrderClicked?.Invoke(this, EventArgs.Empty);
+            btnDeleteOrder.Click += (s, e) => DeleteOrderClicked?.Invoke(this, EventArgs.Empty);
 
-            btnAddPoint.Click += (s, e) => MessageBox.Show("Вызов формы создания ПВЗ");
-            btnEditPoint.Click += (s, e) => MessageBox.Show("Вызов формы изменения ПВЗ");
-            btnDeletePoint.Click += (s, e) => MessageBox.Show("Пункт выдачи удален");
+            // Обработчики Кнопок ПУНКТОВ ВЫДАЧИ
+            btnAddPoint.Click += (s, e) => AddPointClicked?.Invoke(this, EventArgs.Empty);
+            btnEditPoint.Click += (s, e) => EditPointClicked?.Invoke(this, EventArgs.Empty);
+            btnDeletePoint.Click += (s, e) => DeletePointClicked?.Invoke(this, EventArgs.Empty);
 
-            btnAddUser.Click += (s, e) => MessageBox.Show("Вызов формы регистрации пользователя");
-            btnEditUser.Click += (s, e) => MessageBox.Show("Форма изменения прав доступа");
-            btnDeleteUser.Click += (s, e) => MessageBox.Show("Пользователь заблокирован/удален");
+            // Обработчики Кнопок ПОЛЬЗОВАТЕЛЕЙ
+            btnAddUser.Click += (s, e) => AddUserClicked?.Invoke(this, EventArgs.Empty);
+            btnEditUser.Click += (s, e) => EditUserClicked?.Invoke(this, EventArgs.Empty);
+            btnDeleteUser.Click += (s, e) => DeleteUserClicked?.Invoke(this, EventArgs.Empty);
         }
 
         private void ApplyStyleGuide()
@@ -92,42 +108,51 @@ namespace DemoExamRyzhov
 
         public void ApplyAccessRights(UserRole role)
         {
+            // По умолчанию включаем отображение фильтров (для тех, кому они нужны)
+            panelFilters.Visible = true;
+
+            // 1. ГОСТЬ и АВТОРИЗОВАННЫЙ ПОЛЬЗОВАТЕЛЬ (КЛИЕНТ)
             if (role == UserRole.Guest || role == UserRole.Client)
             {
+                // Отключаем фильтры (если гостю они не нужны, как было в твоем коде)
                 panelFilters.Visible = false;
 
-                // Прячем абсолютно все CRUD панели
+                // Прячем абсолютно все панели с кнопками Добавить/Удалить/Изменить
                 panelCRUDProducts.Visible = false;
                 panelCRUDOrders.Visible = false;
                 panelCRUDPoints.Visible = false;
                 panelCRUDUsers.Visible = false;
 
-                tabControl.TabPages.Remove(tabOrders);
-                tabControl.TabPages.Remove(tabPoints);
-                tabControl.TabPages.Remove(tabUsers);
+                // Удаляем все вкладки, кроме Товаров
+                if (tabControl.TabPages.Contains(tabOrders)) tabControl.TabPages.Remove(tabOrders);
+                if (tabControl.TabPages.Contains(tabPoints)) tabControl.TabPages.Remove(tabPoints);
+                if (tabControl.TabPages.Contains(tabUsers)) tabControl.TabPages.Remove(tabUsers);
             }
+            // 2. МЕНЕДЖЕР
             else if (role == UserRole.Manager)
             {
-                panelFilters.Visible = true;
+                // Менеджеру доступны кнопки управления для разрешенных вкладок
+                panelCRUDProducts.Visible = true;
+                panelCRUDOrders.Visible = true;
+                panelCRUDPoints.Visible = true;
 
-                // Менеджер видит таблицы, но не может управлять данными
-                panelCRUDProducts.Visible = false;
-                panelCRUDOrders.Visible = false;
-                panelCRUDPoints.Visible = false;
+                // Панель кнопок пользователей прячем
                 panelCRUDUsers.Visible = false;
 
-                tabControl.TabPages.Remove(tabPoints);
-                tabControl.TabPages.Remove(tabUsers);
+                // Удаляем только вкладку Пользователи (Вкладка Пункты выдачи "tabPoints" ТЕПЕРЬ ОСТАЕТСЯ)
+                if (tabControl.TabPages.Contains(tabUsers)) tabControl.TabPages.Remove(tabUsers);
             }
+            // 3. АДМИНИСТРАТОР
             else if (role == UserRole.Admin)
             {
-                panelFilters.Visible = true;
-
-                // Администратор управляет данными на всех доступных вкладках
+                // Администратору доступно абсолютно всё
                 panelCRUDProducts.Visible = true;
                 panelCRUDOrders.Visible = true;
                 panelCRUDPoints.Visible = true;
                 panelCRUDUsers.Visible = true;
+
+                // Проверяем, чтобы вкладки были на месте (если форма пересоздается)
+                // Если вкладки не удалялись динамически приложением ранее, этот блок сработает по умолчанию
             }
         }
 
@@ -140,12 +165,51 @@ namespace DemoExamRyzhov
         public void SetProducts(DataTable dt)
         {
             dgvProducts.DataSource = dt;
-            HighlightDiscounts();
+
+            // Переименовываем столбцы для пользователя, но для C# имена остаются прежними
+            if (dgvProducts.Columns["article"] != null) dgvProducts.Columns["article"].HeaderText = "Артикул";
+            if (dgvProducts.Columns["name"] != null) dgvProducts.Columns["name"].HeaderText = "Наименование";
+            if (dgvProducts.Columns["unit"] != null) dgvProducts.Columns["unit"].HeaderText = "Ед. измерения";
+            if (dgvProducts.Columns["price"] != null) dgvProducts.Columns["price"].HeaderText = "Цена";
+            if (dgvProducts.Columns["supplier"] != null) dgvProducts.Columns["supplier"].HeaderText = "Поставщик";
+            if (dgvProducts.Columns["manufacturer"] != null) dgvProducts.Columns["manufacturer"].HeaderText = "Производитель";
+            if (dgvProducts.Columns["category"] != null) dgvProducts.Columns["category"].HeaderText = "Категория";
+            if (dgvProducts.Columns["discount"] != null) dgvProducts.Columns["discount"].HeaderText = "Скидка (%)";
+            if (dgvProducts.Columns["stock"] != null) dgvProducts.Columns["stock"].HeaderText = "Кол-во на складе";
+            if (dgvProducts.Columns["description"] != null) dgvProducts.Columns["description"].HeaderText = "Описание";
+
+            HighlightDiscounts(); // Твой метод подсветки сработает идеально, т.к. Cells["discount"] остался на английском
         }
 
-        public void SetOrders(DataTable dt) => dgvOrders.DataSource = dt;
-        public void SetDeliveryPoints(DataTable dt) => dgvPoints.DataSource = dt;
-        public void SetUsers(DataTable dt) => dgvUsers.DataSource = dt;
+        public void SetOrders(DataTable dt)
+        {
+            dgvOrders.DataSource = dt;
+
+            if (dgvOrders.Columns["order_number"] != null) dgvOrders.Columns["order_number"].HeaderText = "Номер заказа";
+            if (dgvOrders.Columns["order_date"] != null) dgvOrders.Columns["order_date"].HeaderText = "Дата заказа";
+            if (dgvOrders.Columns["delivery_date"] != null) dgvOrders.Columns["delivery_date"].HeaderText = "Дата доставки";
+            if (dgvOrders.Columns["order_point_address"] != null) dgvOrders.Columns["order_point_address"].HeaderText = "Адрес ПВЗ";
+            if (dgvOrders.Columns["client"] != null) dgvOrders.Columns["client"].HeaderText = "Клиент";
+            if (dgvOrders.Columns["status"] != null) dgvOrders.Columns["status"].HeaderText = "Статус";
+        }
+
+        public void SetDeliveryPoints(DataTable dt)
+        {
+            dgvPoints.DataSource = dt;
+
+            if (dgvPoints.Columns["id"] != null) dgvPoints.Columns["id"].HeaderText = "ID";
+            if (dgvPoints.Columns["address"] != null) dgvPoints.Columns["address"].HeaderText = "Адрес пункта";
+        }
+
+        public void SetUsers(DataTable dt)
+        {
+            dgvUsers.DataSource = dt;
+
+            if (dgvUsers.Columns["id"] != null) dgvUsers.Columns["id"].HeaderText = "ID";
+            if (dgvUsers.Columns["full_name"] != null) dgvUsers.Columns["full_name"].HeaderText = "ФИО";
+            if (dgvUsers.Columns["login"] != null) dgvUsers.Columns["login"].HeaderText = "Логин";
+            if (dgvUsers.Columns["role_name"] != null) dgvUsers.Columns["role_name"].HeaderText = "Роль";
+        }
 
         public void ShowMessage(string message) => MessageBox.Show(message, "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -164,5 +228,7 @@ namespace DemoExamRyzhov
                 }
             }
         }
+
+
     }
 }

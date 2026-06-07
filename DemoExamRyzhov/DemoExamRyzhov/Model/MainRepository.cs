@@ -17,10 +17,8 @@ namespace DemoExamRyzhov.Model
             using (var conn = DatabaseHelper.GetConnection())
             {
                 conn.Open();
-                // Базовый запрос
                 string query = "SELECT article, name, unit, price, supplier, manufacturer, category, discount, stock, description FROM products WHERE 1=1";
 
-                // Динамически добавляем условия фильтрации
                 if (!string.IsNullOrEmpty(category) && category != "Все категории")
                     query += " AND category = @category";
 
@@ -30,7 +28,6 @@ namespace DemoExamRyzhov.Model
                 if (!string.IsNullOrEmpty(search))
                     query += " AND (name ILIKE @search OR description ILIKE @search)";
 
-                // Добавляем сортировку по цене
                 if (sort == "Стоимость (по возрастанию)")
                     query += " ORDER BY price ASC";
                 else if (sort == "Стоимость (по убыванию)")
@@ -56,7 +53,24 @@ namespace DemoExamRyzhov.Model
             return dt;
         }
 
-        // Получение уникальных категорий для комбобокса
+        public List<string> GetClients()
+        {
+            var clients = new List<string>();
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "SELECT full_name FROM users ORDER BY full_name";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        clients.Add(reader["full_name"].ToString());
+                    }
+                }
+            }
+            return clients;
+        }
         public List<string> GetCategories()
         {
             List<string> list = new List<string> { "Все категории" };
@@ -72,7 +86,6 @@ namespace DemoExamRyzhov.Model
             return list;
         }
 
-        // Получение уникальных производителей для комбобокса
         public List<string> GetManufacturers()
         {
             List<string> list = new List<string> { "Все производители" };
@@ -88,17 +101,19 @@ namespace DemoExamRyzhov.Model
             return list;
         }
 
-        // Простые методы получения остальных таблиц
+        // Синхронизировали алиасы (delivery_point_address) с вызовами в MainPresenter
         public DataTable GetOrders()
         {
             DataTable dt = new DataTable();
             using (var conn = DatabaseHelper.GetConnection())
             {
                 conn.Open();
-                string query = @"SELECT o.order_number, o.order_date, o.delivery_date, p.address as delivery_point, u.full_name as client, o.status 
-                                 FROM orders o
-                                 LEFT JOIN delivery_points p ON o.delivery_point_id = p.id
-                                 LEFT JOIN users u ON o.user_id = u.id";
+                string query = @"SELECT o.order_number, o.order_date, o.delivery_date, 
+                                p.address as order_point_address, 
+                                u.full_name as client, o.status 
+                         FROM orders o
+                         LEFT JOIN delivery_points p ON o.delivery_point_id = p.id
+                         LEFT JOIN users u ON o.user_id = u.id";
                 using (var adapter = new NpgsqlDataAdapter(query, conn)) { adapter.Fill(dt); }
             }
             return dt;
@@ -125,6 +140,253 @@ namespace DemoExamRyzhov.Model
                 using (var adapter = new NpgsqlDataAdapter(query, conn)) { adapter.Fill(dt); }
             }
             return dt;
+        }
+
+        public void DeleteOrder(int orderNumber)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "DELETE FROM orders WHERE order_number = @id";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("id", orderNumber);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteDeliveryPoint(int pointId)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "DELETE FROM delivery_points WHERE id = @id";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("id", pointId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteUser(int userId)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "DELETE FROM users WHERE id = @id";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("id", userId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void AddDeliveryPoint(string address)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "INSERT INTO delivery_points (address) VALUES (@address)";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("address", address);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdateDeliveryPoint(int id, string address)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "UPDATE delivery_points SET address = @address WHERE id = @id";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("address", address);
+                    cmd.Parameters.AddWithValue("id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<string> GetRoleNames()
+        {
+            List<string> list = new List<string>();
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand("SELECT role_name FROM user_roles", conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read()) list.Add(reader["role_name"].ToString());
+                }
+            }
+            return list;
+        }
+
+        public void AddUser(string fullName, string login, string roleName)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = @"INSERT INTO users (full_name, login, password, role_id) 
+                                 VALUES (@name, @login, '12345', (SELECT id FROM user_roles WHERE role_name = @role LIMIT 1))";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("name", fullName);
+                    cmd.Parameters.AddWithValue("login", login);
+                    cmd.Parameters.AddWithValue("role", roleName);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdateUser(int id, string fullName, string login, string roleName)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "UPDATE users SET full_name = @name, login = @login, role_id = (SELECT id FROM user_roles WHERE role_name = @role LIMIT 1) WHERE id = @id";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("name", fullName);
+                    cmd.Parameters.AddWithValue("login", login);
+                    cmd.Parameters.AddWithValue("role", roleName);
+                    cmd.Parameters.AddWithValue("id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void AddProduct(string article, string name, string unit, decimal price, string supplier, string manufacturer, string category, int discount, int stock, string description)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = @"INSERT INTO products (article, name, unit, price, supplier, manufacturer, category, discount, stock, description) 
+                                 VALUES (@article, @name, @unit, @price, @supplier, @manufacturer, @category, @discount, @stock, @description)";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("article", article);
+                    cmd.Parameters.AddWithValue("name", name);
+                    cmd.Parameters.AddWithValue("unit", unit);
+                    cmd.Parameters.AddWithValue("price", price);
+                    cmd.Parameters.AddWithValue("supplier", supplier);
+                    cmd.Parameters.AddWithValue("manufacturer", manufacturer);
+                    cmd.Parameters.AddWithValue("category", category);
+                    cmd.Parameters.AddWithValue("discount", discount);
+                    cmd.Parameters.AddWithValue("stock", stock);
+                    cmd.Parameters.AddWithValue("description", description);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdateProduct(string article, string name, string unit, decimal price, string supplier, string manufacturer, string category, int discount, int stock, string description)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = @"UPDATE products SET name=@name, unit=@unit, price=@price, supplier=@supplier, manufacturer=@manufacturer, 
+                                 category=@category, discount=@discount, stock=@stock, description=@description WHERE article=@article";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("article", article);
+                    cmd.Parameters.AddWithValue("name", name);
+                    cmd.Parameters.AddWithValue("unit", unit);
+                    cmd.Parameters.AddWithValue("price", price);
+                    cmd.Parameters.AddWithValue("supplier", supplier);
+                    cmd.Parameters.AddWithValue("manufacturer", manufacturer);
+                    cmd.Parameters.AddWithValue("category", category);
+                    cmd.Parameters.AddWithValue("discount", discount);
+                    cmd.Parameters.AddWithValue("stock", stock);
+                    cmd.Parameters.AddWithValue("description", description);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteProduct(string article)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = "DELETE FROM products WHERE article = @article";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("article", article);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<string> GetOrderStatuses()
+        {
+            return new List<string> { "Новый", "Завершен", "Отменен" };
+        }
+
+        // Поменяли имя колонки во вложенном SELECT с point_id на delivery_point_id
+        public void AddOrder(DateTime orderDate, DateTime deliveryDate, string pointAddress, string clientName, string status)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+
+                // Генерируем код получения, так как он тоже NOT NULL в твоей базе
+                string pickupCode = new Random().Next(100, 1000).ToString();
+
+                string query = @"INSERT INTO orders (order_number, order_date, delivery_date, delivery_point_id, user_id, pickup_code, status) 
+                         VALUES (
+                             (SELECT COALESCE(MAX(order_number), 0) + 1 FROM orders), 
+                             @orderDate, 
+                             @deliveryDate, 
+                             (SELECT id FROM delivery_points WHERE address = @address LIMIT 1), 
+                             (SELECT id FROM users WHERE full_name = @client LIMIT 1), 
+                             @pickupCode,
+                             @status
+                         )";
+
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("orderDate", orderDate);
+                    cmd.Parameters.AddWithValue("deliveryDate", deliveryDate);
+                    cmd.Parameters.AddWithValue("address", pointAddress);
+                    cmd.Parameters.AddWithValue("client", clientName);
+                    cmd.Parameters.AddWithValue("pickupCode", pickupCode);
+                    cmd.Parameters.AddWithValue("status", status);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Поменяли имя колонки во вложенном SELECT с point_id на delivery_point_id
+        public void UpdateOrder(int orderNumber, DateTime orderDate, DateTime deliveryDate, string pointAddress, string clientName, string status)
+        {
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                string query = @"UPDATE orders 
+                         SET order_date = @orderDate, 
+                             delivery_date = @deliveryDate, 
+                             delivery_point_id = (SELECT id FROM delivery_points WHERE address = @address LIMIT 1), 
+                             user_id = (SELECT id FROM users WHERE full_name = @client LIMIT 1), 
+                             status = @status 
+                         WHERE order_number = @orderNumber";
+                using (var cmd = new NpgsqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("orderNumber", orderNumber);
+                    cmd.Parameters.AddWithValue("orderDate", orderDate);
+                    cmd.Parameters.AddWithValue("deliveryDate", deliveryDate);
+                    cmd.Parameters.AddWithValue("address", pointAddress);
+                    cmd.Parameters.AddWithValue("client", clientName);
+                    cmd.Parameters.AddWithValue("status", status);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

@@ -17,6 +17,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.panelHeader = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
             this.pictureBoxLogo = new System.Windows.Forms.PictureBox();
@@ -78,15 +79,17 @@
             this.panelHeader.Controls.Add(this.pictureBoxLogo);
             this.panelHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelHeader.Location = new System.Drawing.Point(0, 0);
+            this.panelHeader.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelHeader.Name = "panelHeader";
-            this.panelHeader.Size = new System.Drawing.Size(984, 70);
+            this.panelHeader.Size = new System.Drawing.Size(1312, 86);
             this.panelHeader.TabIndex = 0;
             // 
             // lblTitle
             // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Times New Roman", 16F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.Location = new System.Drawing.Point(90, 22);
+            this.lblTitle.Location = new System.Drawing.Point(120, 27);
+            this.lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(244, 25);
             this.lblTitle.TabIndex = 1;
@@ -94,9 +97,10 @@
             // 
             // pictureBoxLogo
             // 
-            this.pictureBoxLogo.Location = new System.Drawing.Point(12, 5);
+            this.pictureBoxLogo.Location = new System.Drawing.Point(16, 6);
+            this.pictureBoxLogo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pictureBoxLogo.Name = "pictureBoxLogo";
-            this.pictureBoxLogo.Size = new System.Drawing.Size(60, 60);
+            this.pictureBoxLogo.Size = new System.Drawing.Size(80, 74);
             this.pictureBoxLogo.TabIndex = 0;
             this.pictureBoxLogo.TabStop = false;
             // 
@@ -107,10 +111,11 @@
             this.tabControl.Controls.Add(this.tabPoints);
             this.tabControl.Controls.Add(this.tabUsers);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl.Location = new System.Drawing.Point(0, 70);
+            this.tabControl.Location = new System.Drawing.Point(0, 86);
+            this.tabControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(984, 591);
+            this.tabControl.Size = new System.Drawing.Size(1312, 728);
             this.tabControl.TabIndex = 1;
             // 
             // tabProducts
@@ -118,10 +123,11 @@
             this.tabProducts.Controls.Add(this.dgvProducts);
             this.tabProducts.Controls.Add(this.panelCRUDProducts);
             this.tabProducts.Controls.Add(this.panelFilters);
-            this.tabProducts.Location = new System.Drawing.Point(4, 22);
+            this.tabProducts.Location = new System.Drawing.Point(4, 25);
+            this.tabProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabProducts.Name = "tabProducts";
-            this.tabProducts.Padding = new System.Windows.Forms.Padding(3);
-            this.tabProducts.Size = new System.Drawing.Size(976, 565);
+            this.tabProducts.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabProducts.Size = new System.Drawing.Size(1304, 699);
             this.tabProducts.TabIndex = 0;
             this.tabProducts.Text = "Товары";
             this.tabProducts.UseVisualStyleBackColor = true;
@@ -134,10 +140,11 @@
             this.dgvProducts.BackgroundColor = System.Drawing.Color.White;
             this.dgvProducts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvProducts.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvProducts.Location = new System.Drawing.Point(3, 63);
+            this.dgvProducts.Location = new System.Drawing.Point(4, 78);
+            this.dgvProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvProducts.Name = "dgvProducts";
             this.dgvProducts.ReadOnly = true;
-            this.dgvProducts.Size = new System.Drawing.Size(970, 444);
+            this.dgvProducts.Size = new System.Drawing.Size(1296, 549);
             this.dgvProducts.TabIndex = 1;
             // 
             // panelCRUDProducts
@@ -146,32 +153,36 @@
             this.panelCRUDProducts.Controls.Add(this.btnEditProduct);
             this.panelCRUDProducts.Controls.Add(this.btnAddProduct);
             this.panelCRUDProducts.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelCRUDProducts.Location = new System.Drawing.Point(3, 507);
+            this.panelCRUDProducts.Location = new System.Drawing.Point(4, 627);
+            this.panelCRUDProducts.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelCRUDProducts.Name = "panelCRUDProducts";
-            this.panelCRUDProducts.Size = new System.Drawing.Size(970, 55);
+            this.panelCRUDProducts.Size = new System.Drawing.Size(1296, 68);
             this.panelCRUDProducts.TabIndex = 2;
             // 
             // btnDeleteProduct
             // 
-            this.btnDeleteProduct.Location = new System.Drawing.Point(265, 10);
+            this.btnDeleteProduct.Location = new System.Drawing.Point(353, 12);
+            this.btnDeleteProduct.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnDeleteProduct.Name = "btnDeleteProduct";
-            this.btnDeleteProduct.Size = new System.Drawing.Size(120, 35);
+            this.btnDeleteProduct.Size = new System.Drawing.Size(160, 43);
             this.btnDeleteProduct.TabIndex = 2;
             this.btnDeleteProduct.Text = "Удалить  товар ";
             // 
             // btnEditProduct
             // 
-            this.btnEditProduct.Location = new System.Drawing.Point(139, 10);
+            this.btnEditProduct.Location = new System.Drawing.Point(185, 12);
+            this.btnEditProduct.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnEditProduct.Name = "btnEditProduct";
-            this.btnEditProduct.Size = new System.Drawing.Size(120, 35);
+            this.btnEditProduct.Size = new System.Drawing.Size(160, 43);
             this.btnEditProduct.TabIndex = 1;
             this.btnEditProduct.Text = "Редактировать  товар";
             // 
             // btnAddProduct
             // 
-            this.btnAddProduct.Location = new System.Drawing.Point(13, 10);
+            this.btnAddProduct.Location = new System.Drawing.Point(17, 12);
+            this.btnAddProduct.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnAddProduct.Name = "btnAddProduct";
-            this.btnAddProduct.Size = new System.Drawing.Size(120, 35);
+            this.btnAddProduct.Size = new System.Drawing.Size(160, 43);
             this.btnAddProduct.TabIndex = 0;
             this.btnAddProduct.Text = "Добавить товар";
             // 
@@ -186,17 +197,19 @@
             this.panelFilters.Controls.Add(this.lblSearch);
             this.panelFilters.Controls.Add(this.txtSearch);
             this.panelFilters.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelFilters.Location = new System.Drawing.Point(3, 3);
+            this.panelFilters.Location = new System.Drawing.Point(4, 4);
+            this.panelFilters.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelFilters.Name = "panelFilters";
-            this.panelFilters.Size = new System.Drawing.Size(970, 60);
+            this.panelFilters.Size = new System.Drawing.Size(1296, 74);
             this.panelFilters.TabIndex = 0;
             // 
             // lblSort
             // 
             this.lblSort.AutoSize = true;
-            this.lblSort.Location = new System.Drawing.Point(745, 12);
+            this.lblSort.Location = new System.Drawing.Point(993, 15);
+            this.lblSort.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSort.Name = "lblSort";
-            this.lblSort.Size = new System.Drawing.Size(70, 13);
+            this.lblSort.Size = new System.Drawing.Size(89, 16);
             this.lblSort.TabIndex = 7;
             this.lblSort.Text = "Сортировка:";
             // 
@@ -207,69 +220,77 @@
             "Без сортировки",
             "Стоимость (по возрастанию)",
             "Стоимость (по убыванию)"});
-            this.cmbSort.Location = new System.Drawing.Point(748, 28);
+            this.cmbSort.Location = new System.Drawing.Point(997, 34);
+            this.cmbSort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbSort.Name = "cmbSort";
-            this.cmbSort.Size = new System.Drawing.Size(200, 21);
+            this.cmbSort.Size = new System.Drawing.Size(265, 24);
             this.cmbSort.TabIndex = 6;
             // 
             // lblManufacturer
             // 
             this.lblManufacturer.AutoSize = true;
-            this.lblManufacturer.Location = new System.Drawing.Point(510, 12);
+            this.lblManufacturer.Location = new System.Drawing.Point(680, 15);
+            this.lblManufacturer.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblManufacturer.Name = "lblManufacturer";
-            this.lblManufacturer.Size = new System.Drawing.Size(89, 13);
+            this.lblManufacturer.Size = new System.Drawing.Size(114, 16);
             this.lblManufacturer.TabIndex = 5;
             this.lblManufacturer.Text = "Производитель:";
             // 
             // cmbManufacturer
             // 
             this.cmbManufacturer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbManufacturer.Location = new System.Drawing.Point(513, 28);
+            this.cmbManufacturer.Location = new System.Drawing.Point(684, 34);
+            this.cmbManufacturer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbManufacturer.Name = "cmbManufacturer";
-            this.cmbManufacturer.Size = new System.Drawing.Size(200, 21);
+            this.cmbManufacturer.Size = new System.Drawing.Size(265, 24);
             this.cmbManufacturer.TabIndex = 4;
             // 
             // lblCategory
             // 
             this.lblCategory.AutoSize = true;
-            this.lblCategory.Location = new System.Drawing.Point(275, 12);
+            this.lblCategory.Location = new System.Drawing.Point(367, 15);
+            this.lblCategory.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCategory.Name = "lblCategory";
-            this.lblCategory.Size = new System.Drawing.Size(63, 13);
+            this.lblCategory.Size = new System.Drawing.Size(78, 16);
             this.lblCategory.TabIndex = 3;
             this.lblCategory.Text = "Категория:";
             // 
             // cmbCategory
             // 
             this.cmbCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbCategory.Location = new System.Drawing.Point(278, 28);
+            this.cmbCategory.Location = new System.Drawing.Point(371, 34);
+            this.cmbCategory.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbCategory.Name = "cmbCategory";
-            this.cmbCategory.Size = new System.Drawing.Size(200, 21);
+            this.cmbCategory.Size = new System.Drawing.Size(265, 24);
             this.cmbCategory.TabIndex = 2;
             // 
             // lblSearch
             // 
             this.lblSearch.AutoSize = true;
-            this.lblSearch.Location = new System.Drawing.Point(10, 12);
+            this.lblSearch.Location = new System.Drawing.Point(13, 15);
+            this.lblSearch.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSearch.Name = "lblSearch";
-            this.lblSearch.Size = new System.Drawing.Size(42, 13);
+            this.lblSearch.Size = new System.Drawing.Size(50, 16);
             this.lblSearch.TabIndex = 1;
             this.lblSearch.Text = "Поиск:";
             // 
             // txtSearch
             // 
-            this.txtSearch.Location = new System.Drawing.Point(13, 29);
+            this.txtSearch.Location = new System.Drawing.Point(17, 36);
+            this.txtSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(230, 20);
+            this.txtSearch.Size = new System.Drawing.Size(305, 22);
             this.txtSearch.TabIndex = 0;
             // 
             // tabOrders
             // 
             this.tabOrders.Controls.Add(this.dgvOrders);
             this.tabOrders.Controls.Add(this.panelCRUDOrders);
-            this.tabOrders.Location = new System.Drawing.Point(4, 22);
+            this.tabOrders.Location = new System.Drawing.Point(4, 25);
+            this.tabOrders.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabOrders.Name = "tabOrders";
-            this.tabOrders.Padding = new System.Windows.Forms.Padding(3);
-            this.tabOrders.Size = new System.Drawing.Size(976, 565);
+            this.tabOrders.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabOrders.Size = new System.Drawing.Size(1304, 698);
             this.tabOrders.TabIndex = 1;
             this.tabOrders.Text = "Заказы";
             this.tabOrders.UseVisualStyleBackColor = true;
@@ -282,10 +303,11 @@
             this.dgvOrders.BackgroundColor = System.Drawing.Color.White;
             this.dgvOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvOrders.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvOrders.Location = new System.Drawing.Point(3, 3);
+            this.dgvOrders.Location = new System.Drawing.Point(4, 4);
+            this.dgvOrders.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvOrders.Name = "dgvOrders";
             this.dgvOrders.ReadOnly = true;
-            this.dgvOrders.Size = new System.Drawing.Size(970, 504);
+            this.dgvOrders.Size = new System.Drawing.Size(1296, 622);
             this.dgvOrders.TabIndex = 0;
             // 
             // panelCRUDOrders
@@ -294,32 +316,36 @@
             this.panelCRUDOrders.Controls.Add(this.btnEditOrder);
             this.panelCRUDOrders.Controls.Add(this.btnAddOrder);
             this.panelCRUDOrders.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelCRUDOrders.Location = new System.Drawing.Point(3, 507);
+            this.panelCRUDOrders.Location = new System.Drawing.Point(4, 626);
+            this.panelCRUDOrders.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelCRUDOrders.Name = "panelCRUDOrders";
-            this.panelCRUDOrders.Size = new System.Drawing.Size(970, 55);
+            this.panelCRUDOrders.Size = new System.Drawing.Size(1296, 68);
             this.panelCRUDOrders.TabIndex = 1;
             // 
             // btnDeleteOrder
             // 
-            this.btnDeleteOrder.Location = new System.Drawing.Point(265, 10);
+            this.btnDeleteOrder.Location = new System.Drawing.Point(353, 12);
+            this.btnDeleteOrder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnDeleteOrder.Name = "btnDeleteOrder";
-            this.btnDeleteOrder.Size = new System.Drawing.Size(120, 35);
+            this.btnDeleteOrder.Size = new System.Drawing.Size(160, 43);
             this.btnDeleteOrder.TabIndex = 0;
             this.btnDeleteOrder.Text = "Удалить заказ";
             // 
             // btnEditOrder
             // 
-            this.btnEditOrder.Location = new System.Drawing.Point(139, 10);
+            this.btnEditOrder.Location = new System.Drawing.Point(185, 12);
+            this.btnEditOrder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnEditOrder.Name = "btnEditOrder";
-            this.btnEditOrder.Size = new System.Drawing.Size(120, 35);
+            this.btnEditOrder.Size = new System.Drawing.Size(160, 43);
             this.btnEditOrder.TabIndex = 1;
             this.btnEditOrder.Text = "Редактировать заказ";
             // 
             // btnAddOrder
             // 
-            this.btnAddOrder.Location = new System.Drawing.Point(13, 10);
+            this.btnAddOrder.Location = new System.Drawing.Point(17, 12);
+            this.btnAddOrder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnAddOrder.Name = "btnAddOrder";
-            this.btnAddOrder.Size = new System.Drawing.Size(120, 35);
+            this.btnAddOrder.Size = new System.Drawing.Size(160, 43);
             this.btnAddOrder.TabIndex = 2;
             this.btnAddOrder.Text = "Создать заказ";
             // 
@@ -327,9 +353,10 @@
             // 
             this.tabPoints.Controls.Add(this.dgvPoints);
             this.tabPoints.Controls.Add(this.panelCRUDPoints);
-            this.tabPoints.Location = new System.Drawing.Point(4, 22);
+            this.tabPoints.Location = new System.Drawing.Point(4, 25);
+            this.tabPoints.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPoints.Name = "tabPoints";
-            this.tabPoints.Size = new System.Drawing.Size(976, 565);
+            this.tabPoints.Size = new System.Drawing.Size(1304, 698);
             this.tabPoints.TabIndex = 2;
             this.tabPoints.Text = "Пункты выдачи";
             this.tabPoints.UseVisualStyleBackColor = true;
@@ -343,9 +370,10 @@
             this.dgvPoints.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPoints.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvPoints.Location = new System.Drawing.Point(0, 0);
+            this.dgvPoints.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvPoints.Name = "dgvPoints";
             this.dgvPoints.ReadOnly = true;
-            this.dgvPoints.Size = new System.Drawing.Size(976, 510);
+            this.dgvPoints.Size = new System.Drawing.Size(1304, 630);
             this.dgvPoints.TabIndex = 0;
             // 
             // panelCRUDPoints
@@ -354,32 +382,36 @@
             this.panelCRUDPoints.Controls.Add(this.btnEditPoint);
             this.panelCRUDPoints.Controls.Add(this.btnAddPoint);
             this.panelCRUDPoints.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelCRUDPoints.Location = new System.Drawing.Point(0, 510);
+            this.panelCRUDPoints.Location = new System.Drawing.Point(0, 630);
+            this.panelCRUDPoints.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelCRUDPoints.Name = "panelCRUDPoints";
-            this.panelCRUDPoints.Size = new System.Drawing.Size(976, 55);
+            this.panelCRUDPoints.Size = new System.Drawing.Size(1304, 68);
             this.panelCRUDPoints.TabIndex = 1;
             // 
             // btnDeletePoint
             // 
-            this.btnDeletePoint.Location = new System.Drawing.Point(265, 10);
+            this.btnDeletePoint.Location = new System.Drawing.Point(353, 12);
+            this.btnDeletePoint.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnDeletePoint.Name = "btnDeletePoint";
-            this.btnDeletePoint.Size = new System.Drawing.Size(120, 35);
+            this.btnDeletePoint.Size = new System.Drawing.Size(160, 43);
             this.btnDeletePoint.TabIndex = 0;
             this.btnDeletePoint.Text = "Удалить ПВЗ";
             // 
             // btnEditPoint
             // 
-            this.btnEditPoint.Location = new System.Drawing.Point(139, 10);
+            this.btnEditPoint.Location = new System.Drawing.Point(185, 12);
+            this.btnEditPoint.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnEditPoint.Name = "btnEditPoint";
-            this.btnEditPoint.Size = new System.Drawing.Size(120, 35);
+            this.btnEditPoint.Size = new System.Drawing.Size(160, 43);
             this.btnEditPoint.TabIndex = 1;
             this.btnEditPoint.Text = "Изменить ПВЗ";
             // 
             // btnAddPoint
             // 
-            this.btnAddPoint.Location = new System.Drawing.Point(13, 10);
+            this.btnAddPoint.Location = new System.Drawing.Point(17, 12);
+            this.btnAddPoint.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnAddPoint.Name = "btnAddPoint";
-            this.btnAddPoint.Size = new System.Drawing.Size(120, 35);
+            this.btnAddPoint.Size = new System.Drawing.Size(160, 43);
             this.btnAddPoint.TabIndex = 2;
             this.btnAddPoint.Text = "Добавить ПВЗ";
             // 
@@ -387,9 +419,10 @@
             // 
             this.tabUsers.Controls.Add(this.dgvUsers);
             this.tabUsers.Controls.Add(this.panelCRUDUsers);
-            this.tabUsers.Location = new System.Drawing.Point(4, 22);
+            this.tabUsers.Location = new System.Drawing.Point(4, 25);
+            this.tabUsers.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabUsers.Name = "tabUsers";
-            this.tabUsers.Size = new System.Drawing.Size(976, 565);
+            this.tabUsers.Size = new System.Drawing.Size(1304, 698);
             this.tabUsers.TabIndex = 3;
             this.tabUsers.Text = "Пользователи";
             this.tabUsers.UseVisualStyleBackColor = true;
@@ -403,9 +436,10 @@
             this.dgvUsers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvUsers.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvUsers.Location = new System.Drawing.Point(0, 0);
+            this.dgvUsers.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvUsers.Name = "dgvUsers";
             this.dgvUsers.ReadOnly = true;
-            this.dgvUsers.Size = new System.Drawing.Size(976, 510);
+            this.dgvUsers.Size = new System.Drawing.Size(1304, 630);
             this.dgvUsers.TabIndex = 0;
             // 
             // panelCRUDUsers
@@ -414,42 +448,48 @@
             this.panelCRUDUsers.Controls.Add(this.btnEditUser);
             this.panelCRUDUsers.Controls.Add(this.btnAddUser);
             this.panelCRUDUsers.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelCRUDUsers.Location = new System.Drawing.Point(0, 510);
+            this.panelCRUDUsers.Location = new System.Drawing.Point(0, 630);
+            this.panelCRUDUsers.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelCRUDUsers.Name = "panelCRUDUsers";
-            this.panelCRUDUsers.Size = new System.Drawing.Size(976, 55);
+            this.panelCRUDUsers.Size = new System.Drawing.Size(1304, 68);
             this.panelCRUDUsers.TabIndex = 1;
             // 
             // btnDeleteUser
             // 
-            this.btnDeleteUser.Location = new System.Drawing.Point(265, 10);
+            this.btnDeleteUser.Location = new System.Drawing.Point(353, 12);
+            this.btnDeleteUser.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnDeleteUser.Name = "btnDeleteUser";
-            this.btnDeleteUser.Size = new System.Drawing.Size(120, 35);
+            this.btnDeleteUser.Size = new System.Drawing.Size(160, 43);
             this.btnDeleteUser.TabIndex = 0;
             this.btnDeleteUser.Text = "Удалить пользователя";
             // 
             // btnEditUser
             // 
-            this.btnEditUser.Location = new System.Drawing.Point(139, 10);
+            this.btnEditUser.Location = new System.Drawing.Point(185, 12);
+            this.btnEditUser.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnEditUser.Name = "btnEditUser";
-            this.btnEditUser.Size = new System.Drawing.Size(120, 35);
+            this.btnEditUser.Size = new System.Drawing.Size(160, 43);
             this.btnEditUser.TabIndex = 1;
             this.btnEditUser.Text = "Изменить пользователя";
             // 
             // btnAddUser
             // 
-            this.btnAddUser.Location = new System.Drawing.Point(13, 10);
+            this.btnAddUser.Location = new System.Drawing.Point(17, 12);
+            this.btnAddUser.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnAddUser.Name = "btnAddUser";
-            this.btnAddUser.Size = new System.Drawing.Size(120, 35);
+            this.btnAddUser.Size = new System.Drawing.Size(160, 43);
             this.btnAddUser.TabIndex = 2;
             this.btnAddUser.Text = "Создать пользователя";
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 661);
+            this.ClientSize = new System.Drawing.Size(1312, 814);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.panelHeader);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MainForm";

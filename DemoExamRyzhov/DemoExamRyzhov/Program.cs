@@ -33,8 +33,8 @@ namespace DemoExamRyzhov
                 MainForm mainForm = new MainForm();
                 MainRepository mainRepo = new MainRepository();
 
-                // Связываем форму и репозиторий через презентер главного окна
-                MainPresenter mainPresenter = new MainPresenter(mainForm, mainRepo);
+                // БЕРЕМ РОЛЬ НАПРЯМУЮ ИЗ ТВОЕЙ СЕССИИ, КУДА ЕЕ ЗАПИСАЛ LOGINPRESENTER
+                MainPresenter mainPresenter = new MainPresenter(mainForm, mainRepo, UserSession.CurrentRole);
 
                 // Запускаем главное окно программы
                 Application.Run(mainForm);

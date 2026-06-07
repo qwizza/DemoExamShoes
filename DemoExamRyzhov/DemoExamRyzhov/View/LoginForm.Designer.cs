@@ -17,6 +17,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoginForm));
             this.panelHeader = new System.Windows.Forms.Panel();
             this.lblHeader = new System.Windows.Forms.Label();
             this.lblLogin = new System.Windows.Forms.Label();
@@ -53,7 +54,7 @@
             this.lblLogin.AutoSize = true;
             this.lblLogin.Location = new System.Drawing.Point(40, 95);
             this.lblLogin.Name = "lblLogin";
-            this.lblLogin.Size = new System.Drawing.Size(52, 17);
+            this.lblLogin.Size = new System.Drawing.Size(49, 16);
             this.lblLogin.TabIndex = 1;
             this.lblLogin.Text = "Логин:";
             // 
@@ -62,7 +63,7 @@
             this.lblPassword.AutoSize = true;
             this.lblPassword.Location = new System.Drawing.Point(40, 155);
             this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(57, 17);
+            this.lblPassword.Size = new System.Drawing.Size(59, 16);
             this.lblPassword.TabIndex = 3;
             this.lblPassword.Text = "Пароль:";
             // 
@@ -70,14 +71,14 @@
             // 
             this.txtLogin.Location = new System.Drawing.Point(43, 115);
             this.txtLogin.Name = "txtLogin";
-            this.txtLogin.Size = new System.Drawing.Size(300, 25);
+            this.txtLogin.Size = new System.Drawing.Size(300, 22);
             this.txtLogin.TabIndex = 2;
             // 
             // txtPassword
             // 
             this.txtPassword.Location = new System.Drawing.Point(43, 175);
             this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(300, 25);
+            this.txtPassword.Size = new System.Drawing.Size(300, 22);
             this.txtPassword.TabIndex = 4;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
@@ -112,6 +113,7 @@
             this.Controls.Add(this.lblLogin);
             this.Controls.Add(this.panelHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "LoginForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
