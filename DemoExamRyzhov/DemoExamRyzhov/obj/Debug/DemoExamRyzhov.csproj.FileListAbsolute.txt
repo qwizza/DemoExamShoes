@@ -44,3 +44,4 @@ C:\Users\zhesmik\source\ReposDemoExam\DemoExamRyzhov\DemoExamRyzhov\obj\Debug\De
 C:\Users\zhesmik\source\ReposDemoExam\DemoExamRyzhov\DemoExamRyzhov\obj\Debug\DemoExamRyzhov.exe.config
 C:\Users\zhesmik\source\ReposDemoExam\DemoExamRyzhov\DemoExamRyzhov\obj\Debug\DemoExamRyzhov.View.OrderForm.resources
 C:\Users\zhesmik\source\ReposDemoExam\DemoExamRyzhov\DemoExamRyzhov\obj\Debug\DemoExamRyzhov.LoginForm.resources
+C:\Users\zhesmik\source\ReposDemoExam\DemoExamRyzhov\DemoExamRyzhov\obj\Debug\DemoExamRyzhov.View.ProductForm.resources

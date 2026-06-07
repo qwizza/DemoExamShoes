@@ -1,21 +1,19 @@
 ﻿using DemoExamRyzhov.Model;
 using DemoExamRyzhov.View;
-using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DemoExamRyzhov.Presenter
 {
     public class MainPresenter
     {
+        // Поля
         private readonly IMainView _view;
         private readonly MainRepository _repository;
         private readonly UserRole _currentRole;
 
+        // Конструктор и инициализация
         public MainPresenter(IMainView view, MainRepository repository, UserRole role)
         {
             _view = view;
@@ -24,46 +22,197 @@ namespace DemoExamRyzhov.Presenter
 
             _view.ApplyAccessRights(_currentRole);
 
-            // Подписка на фильтры и CRUD товаров
+            RegisterEvents();
+
+            LoadAllData();
+        }
+
+        private void RegisterEvents()
+        {
+            // Фильтры и товары
             _view.FilterChanged += OnFilterChanged;
             _view.AddProductClicked += OnAddProduct;
             _view.EditProductClicked += OnEditProduct;
             _view.DeleteProductClicked += OnDeleteProduct;
 
-            // ПОДПИСКА НА КНОПКИ ЗАКАЗОВ
+            // Заказы
             _view.AddOrderClicked += OnAddOrder;
             _view.EditOrderClicked += OnEditOrder;
             _view.DeleteOrderClicked += OnDeleteOrder;
 
-            // ПОДПИСКА НА КНОПКИ ПВЗ
+            // ПВЗ
             _view.AddPointClicked += OnAddPoint;
             _view.EditPointClicked += OnEditPoint;
             _view.DeletePointClicked += OnDeletePoint;
 
-            // ПОДПИСКА НА КНОПКИ ПОЛЬЗОВАТЕЛЕЙ
+            // Пользователи
             _view.AddUserClicked += OnAddUser;
             _view.EditUserClicked += OnEditUser;
             _view.DeleteUserClicked += OnDeleteUser;
-
-            // Первая загрузка данных
-            LoadAllData();
         }
 
         private void LoadAllData()
         {
-            // Метод обновляет все таблицы на форме актуальными данными из БД
-            _view.SetProducts(_repository.GetFilteredProducts(_view.SearchText, _view.SelectedCategory, _view.SelectedManufacturer, _view.SelectedSort));
+            UpdateProductsList();
             _view.SetOrders(_repository.GetOrders());
             _view.SetDeliveryPoints(_repository.GetDeliveryPoints());
             _view.SetUsers(_repository.GetUsers());
         }
 
-        private void OnFilterChanged(object sender, EventArgs e)
+        private void UpdateProductsList()
         {
-            _view.SetProducts(_repository.GetFilteredProducts(_view.SearchText, _view.SelectedCategory, _view.SelectedManufacturer, _view.SelectedSort));
+            _view.SetProducts(_repository.GetFilteredProducts(
+                _view.SearchText,
+                _view.SelectedCategory,
+                _view.SelectedManufacturer,
+                _view.SelectedSort
+            ));
         }
 
-        // ЛОГИКА УДАЛЕНИЯ ЗАКАЗА
+        private void OnFilterChanged(object sender, EventArgs e)
+        {
+            UpdateProductsList();
+        }
+
+        // Упраление товарами
+        private void OnAddProduct(object sender, EventArgs e)
+        {
+            var cats = _repository.GetCategories();
+            var mans = _repository.GetManufacturers();
+
+            using (var form = new ProductForm(cats, mans))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        _repository.AddProduct(form.ArticleText, form.NameText, form.UnitText, form.PriceValue,
+                                               form.SupplierText, form.SelectedManufacturer, form.SelectedCategory,
+                                               form.DiscountValue, form.StockValue, form.DescriptionText);
+                        _view.ShowMessage("Товар добавлен успешно!");
+                        UpdateProductsList();
+                    }
+                    catch (Exception ex) { _view.ShowMessage("Ошибка добавления товара: " + ex.Message); }
+                }
+            }
+        }
+
+        private void OnEditProduct(object sender, EventArgs e)
+        {
+            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabProducts"]?.Controls["dgvProducts"] as DataGridView;
+            if (dgv?.CurrentRow != null)
+            {
+                var row = ((System.Data.DataRowView)dgv.CurrentRow.DataBoundItem).Row;
+                var cats = _repository.GetCategories();
+                var mans = _repository.GetManufacturers();
+
+                using (var form = new ProductForm(row, cats, mans))
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            _repository.UpdateProduct(form.ArticleText, form.NameText, form.UnitText, form.PriceValue,
+                                                      form.SupplierText, form.SelectedManufacturer, form.SelectedCategory,
+                                                      form.DiscountValue, form.StockValue, form.DescriptionText);
+                            _view.ShowMessage("Товар обновлен успешно!");
+                            UpdateProductsList();
+                        }
+                        catch (Exception ex) { _view.ShowMessage("Ошибка обновления товара: " + ex.Message); }
+                    }
+                }
+            }
+            else
+            {
+                _view.ShowMessage("Пожалуйста, выберите товар из списка для изменения.");
+            }
+        }
+
+        private void OnDeleteProduct(object sender, EventArgs e)
+        {
+            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabProducts"]?.Controls["dgvProducts"] as DataGridView;
+            if (dgv?.CurrentRow != null)
+            {
+                string article = dgv.CurrentRow.Cells["article"].Value.ToString();
+                string name = dgv.CurrentRow.Cells["name"].Value.ToString();
+
+                if (MessageBox.Show($"Вы уверены, что хотите удалить товар \"{name}\" (Артикул: {article})?", "Подтверждение удаления", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    try
+                    {
+                        _repository.DeleteProduct(article);
+                        _view.ShowMessage("Товар успешно удален!");
+                        UpdateProductsList();
+                    }
+                    catch (Exception ex) { _view.ShowMessage("Ошибка удаления (возможно, товар оформлен в заказах): " + ex.Message); }
+                }
+            }
+            else
+            {
+                _view.ShowMessage("Пожалуйста, выберите товар для удаления.");
+            }
+        }
+
+        // Управление заказами 
+        private void OnAddOrder(object sender, EventArgs e)
+        {
+            var points = new List<string>();
+            var dtPoints = _repository.GetDeliveryPoints();
+            foreach (System.Data.DataRow r in dtPoints.Rows) points.Add(r["address"].ToString());
+
+            var clients = _repository.GetClients();
+            var statuses = _repository.GetOrderStatuses();
+
+            using (var form = new OrderForm(points, clients, statuses))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        _repository.AddOrder(form.OrderDateValue, form.DeliveryDateValue, form.SelectedPoint, form.SelectedClient, form.SelectedStatus);
+                        _view.ShowMessage("Заказ успешно сформирован!");
+                        _view.SetOrders(_repository.GetOrders());
+                    }
+                    catch (Exception ex) { _view.ShowMessage("Ошибка создания заказа: " + ex.Message); }
+                }
+            }
+        }
+
+        private void OnEditOrder(object sender, EventArgs e)
+        {
+            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabOrders"]?.Controls["dgvOrders"] as DataGridView;
+            if (dgv?.CurrentRow != null)
+            {
+                int orderNumber = Convert.ToInt32(dgv.CurrentRow.Cells["order_number"].Value);
+                DateTime orderDate = Convert.ToDateTime(dgv.CurrentRow.Cells["order_date"].Value);
+                DateTime deliveryDate = Convert.ToDateTime(dgv.CurrentRow.Cells["delivery_date"].Value);
+                string currentPoint = dgv.CurrentRow.Cells["order_point_address"].Value.ToString();
+                string currentClient = dgv.CurrentRow.Cells["client"].Value.ToString();
+                string currentStatus = dgv.CurrentRow.Cells["status"].Value.ToString();
+
+                var points = new List<string>();
+                var dtPoints = _repository.GetDeliveryPoints();
+                foreach (System.Data.DataRow r in dtPoints.Rows) points.Add(r["address"].ToString());
+
+                var clients = _repository.GetClients();
+                var statuses = _repository.GetOrderStatuses();
+
+                using (var form = new OrderForm(orderNumber, orderDate, deliveryDate, currentPoint, currentClient, currentStatus, points, clients, statuses))
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            _repository.UpdateOrder(orderNumber,form.OrderDateValue,form.SelectedPoint,form.SelectedStatus,form.DeliveryDateValue,form.SelectedClient);
+                            _view.ShowMessage("Заказ успешно обновлен!");
+                            _view.SetOrders(_repository.GetOrders());
+                        }
+                        catch (Exception ex) { _view.ShowMessage("Ошибка обновления заказа: " + ex.Message); }
+                    }
+                }
+            }
+        }
+
         private void OnDeleteOrder(object sender, EventArgs e)
         {
             var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabOrders"]?.Controls["dgvOrders"] as DataGridView;
@@ -83,47 +232,7 @@ namespace DemoExamRyzhov.Presenter
             }
         }
 
-        // ЛОГИКА УДАЛЕНИЯ ПВЗ
-        private void OnDeletePoint(object sender, EventArgs e)
-        {
-            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabPoints"]?.Controls["dgvPoints"] as DataGridView;
-            if (dgv?.CurrentRow != null)
-            {
-                int id = Convert.ToInt32(dgv.CurrentRow.Cells["id"].Value);
-                if (MessageBox.Show($"Удалить пункт выдачи №{id}?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                {
-                    try
-                    {
-                        _repository.DeleteDeliveryPoint(id);
-                        _view.ShowMessage("Пункт выдачи удален!");
-                        _view.SetDeliveryPoints(_repository.GetDeliveryPoints());
-                    }
-                    catch (Exception ex) { _view.ShowMessage("Ошибка: " + ex.Message); }
-                }
-            }
-        }
-
-        // ЛОГИКА УДАЛЕНИЯ ПОЛЬЗОВАТЕЛЯ
-        private void OnDeleteUser(object sender, EventArgs e)
-        {
-            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabUsers"]?.Controls["dgvUsers"] as DataGridView;
-            if (dgv?.CurrentRow != null)
-            {
-                int id = Convert.ToInt32(dgv.CurrentRow.Cells["id"].Value);
-                string login = dgv.CurrentRow.Cells["login"].Value.ToString();
-                if (MessageBox.Show($"Удалить пользователя {login}?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                {
-                    try
-                    {
-                        _repository.DeleteUser(id);
-                        _view.ShowMessage("Пользователь стерт из системы!");
-                        _view.SetUsers(_repository.GetUsers());
-                    }
-                    catch (Exception ex) { _view.ShowMessage("Ошибка: " + ex.Message); }
-                }
-            }
-        }
-
+        // Управление ПВЗ
         private void OnAddPoint(object sender, EventArgs e)
         {
             using (var form = new PointForm())
@@ -144,7 +253,6 @@ namespace DemoExamRyzhov.Presenter
         private void OnEditPoint(object sender, EventArgs e)
         {
             var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabPoints"]?.Controls["dgvPoints"] as DataGridView;
-
             if (dgv?.CurrentRow != null)
             {
                 int id = Convert.ToInt32(dgv.CurrentRow.Cells["id"].Value);
@@ -170,6 +278,26 @@ namespace DemoExamRyzhov.Presenter
             }
         }
 
+        private void OnDeletePoint(object sender, EventArgs e)
+        {
+            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabPoints"]?.Controls["dgvPoints"] as DataGridView;
+            if (dgv?.CurrentRow != null)
+            {
+                int id = Convert.ToInt32(dgv.CurrentRow.Cells["id"].Value);
+                if (MessageBox.Show($"Удалить пункт выдачи №{id}?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    try
+                    {
+                        _repository.DeleteDeliveryPoint(id);
+                        _view.ShowMessage("Пункт выдачи удален!");
+                        _view.SetDeliveryPoints(_repository.GetDeliveryPoints());
+                    }
+                    catch (Exception ex) { _view.ShowMessage("Ошибка: " + ex.Message); }
+                }
+            }
+        }
+
+        // Управление пользователями 
         private void OnAddUser(object sender, EventArgs e)
         {
             var roles = _repository.GetRoleNames();
@@ -219,153 +347,22 @@ namespace DemoExamRyzhov.Presenter
             }
         }
 
-        private void OnAddProduct(object sender, EventArgs e)
+        private void OnDeleteUser(object sender, EventArgs e)
         {
-            var cats = _repository.GetCategories();
-            var mans = _repository.GetManufacturers();
-
-            using (var form = new ProductForm(cats, mans))
+            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabUsers"]?.Controls["dgvUsers"] as DataGridView;
+            if (dgv?.CurrentRow != null)
             {
-                if (form.ShowDialog() == DialogResult.OK)
+                int id = Convert.ToInt32(dgv.CurrentRow.Cells["id"].Value);
+                string login = dgv.CurrentRow.Cells["login"].Value.ToString();
+                if (MessageBox.Show($"Удалить пользователя {login}?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     try
                     {
-                        _repository.AddProduct(form.ArticleText, form.NameText, form.UnitText, form.PriceValue,
-                                               form.SupplierText, form.SelectedManufacturer, form.SelectedCategory,
-                                               form.DiscountValue, form.StockValue, form.DescriptionText);
-                        _view.ShowMessage("Товар добавлен успешно!");
-                        OnFilterChanged(null, null);
+                        _repository.DeleteUser(id);
+                        _view.ShowMessage("Пользователь стерт из системы!");
+                        _view.SetUsers(_repository.GetUsers());
                     }
-                    catch (Exception ex) { _view.ShowMessage("Ошибка добавления товара: " + ex.Message); }
-                }
-            }
-        }
-
-        private void OnEditProduct(object sender, EventArgs e)
-        {
-            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabProducts"]?.Controls["dgvProducts"] as DataGridView;
-
-            if (dgv?.CurrentRow != null)
-            {
-                var row = ((System.Data.DataRowView)dgv.CurrentRow.DataBoundItem).Row;
-
-                var cats = _repository.GetCategories();
-                var mans = _repository.GetManufacturers();
-
-                using (var form = new ProductForm(row, cats, mans))
-                {
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        try
-                        {
-                            _repository.UpdateProduct(form.ArticleText, form.NameText, form.UnitText, form.PriceValue,
-                                                      form.SupplierText, form.SelectedManufacturer, form.SelectedCategory,
-                                                      form.DiscountValue, form.StockValue, form.DescriptionText);
-                            _view.ShowMessage("Товар обновлен успешно!");
-                            OnFilterChanged(null, null);
-                        }
-                        catch (Exception ex) { _view.ShowMessage("Ошибка обновления товара: " + ex.Message); }
-                    }
-                }
-            }
-            else
-            {
-                _view.ShowMessage("Пожалуйста, выберите товар из списка для изменения.");
-            }
-        }
-
-        private void OnDeleteProduct(object sender, EventArgs e)
-        {
-            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabProducts"]?.Controls["dgvProducts"] as DataGridView;
-
-            if (dgv?.CurrentRow != null)
-            {
-                string article = dgv.CurrentRow.Cells["article"].Value.ToString();
-                string name = dgv.CurrentRow.Cells["name"].Value.ToString();
-
-                if (MessageBox.Show($"Вы уверены, что хотите удалить товар \"{name}\" (Артикул: {article})?", "Подтверждение удаления", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    try
-                    {
-                        _repository.DeleteProduct(article);
-                        _view.ShowMessage("Товар успешно удален!");
-                        OnFilterChanged(null, null);
-                    }
-                    catch (Exception ex)
-                    {
-                        _view.ShowMessage("Ошибка удаления (возможно, товар оформлен в заказах): " + ex.Message);
-                    }
-                }
-            }
-            else
-            {
-                _view.ShowMessage("Пожалуйста, выберите товар для удаления.");
-            }
-        }
-
-        private void OnAddOrder(object sender, EventArgs e)
-        {
-            var points = new List<string>();
-            var dtPoints = _repository.GetDeliveryPoints();
-            foreach (System.Data.DataRow r in dtPoints.Rows) points.Add(r["address"].ToString());
-
-            // Получаем список клиентов из базы
-            var clients = _repository.GetClients();
-            var statuses = _repository.GetOrderStatuses();
-
-            using (var form = new OrderForm(points, clients, statuses))
-            {
-                if (form.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        // Прокидываем выбранного клиента в репозиторий
-                        _repository.AddOrder(form.OrderDateValue, form.DeliveryDateValue, form.SelectedPoint, form.SelectedClient, form.SelectedStatus);
-                        _view.ShowMessage("Заказ успешно сформирован!");
-                        _view.SetOrders(_repository.GetOrders());
-                    }
-                    catch (Exception ex) { _view.ShowMessage("Ошибка создания заказа: " + ex.Message); }
-                }
-            }
-        }
-
-        private void OnEditOrder(object sender, EventArgs e)
-        {
-            var dgv = (sender as MainForm)?.Controls["tabControl"]?.Controls["tabOrders"]?.Controls["dgvOrders"] as DataGridView;
-
-            if (dgv?.CurrentRow != null)
-            {
-                int orderNumber = Convert.ToInt32(dgv.CurrentRow.Cells["order_number"].Value);
-
-                // ДОБАВИЛИ: Вытаскиваем дату заказа из таблицы, чтобы она существовала в контексте
-                DateTime orderDate = Convert.ToDateTime(dgv.CurrentRow.Cells["order_date"].Value);
-                DateTime deliveryDate = Convert.ToDateTime(dgv.CurrentRow.Cells["delivery_date"].Value);
-
-                string currentPoint = dgv.CurrentRow.Cells["order_point_address"].Value.ToString();
-                string currentClient = dgv.CurrentRow.Cells["client"].Value.ToString(); // Вытаскиваем текущего клиента
-                string currentStatus = dgv.CurrentRow.Cells["status"].Value.ToString();
-
-                var points = new List<string>();
-                var dtPoints = _repository.GetDeliveryPoints();
-                foreach (System.Data.DataRow r in dtPoints.Rows) points.Add(r["address"].ToString());
-
-                var clients = _repository.GetClients();
-                var statuses = _repository.GetOrderStatuses();
-
-                // ИСПРАВИЛИ: Передаем orderDate вместо несуществующей date
-                using (var form = new OrderForm(orderNumber, orderDate, deliveryDate, currentPoint, currentClient, currentStatus, points, clients, statuses))
-                {
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        try
-                        {
-                            // Для апдейта передаем все измененные параметры в репозиторий
-                            _repository.UpdateOrder(orderNumber, form.OrderDateValue, form.DeliveryDateValue, form.SelectedPoint, form.SelectedClient, form.SelectedStatus);
-                            _view.ShowMessage("Заказ успешно обновлен!");
-                            _view.SetOrders(_repository.GetOrders());
-                        }
-                        catch (Exception ex) { _view.ShowMessage("Ошибка обновления заказа: " + ex.Message); }
-                    }
+                    catch (Exception ex) { _view.ShowMessage("Ошибка: " + ex.Message); }
                 }
             }
         }

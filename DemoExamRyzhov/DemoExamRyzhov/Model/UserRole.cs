@@ -14,7 +14,6 @@ namespace DemoExamRyzhov.Model
         Admin
     }
 
-    // Статический класс, доступный из любой точки программы
     public static class UserSession
     {
         public static UserRole CurrentRole { get; set; } = UserRole.Guest;

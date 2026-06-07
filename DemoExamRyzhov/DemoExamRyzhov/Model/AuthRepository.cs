@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DemoExamRyzhov.Model
 {
     public class AuthRepository
     {
-        // Метод возвращает кортеж: (успешно ли, имя роли, ФИО, id пользователя)
+        // Проверяю учетные данные пользователя в БД.
         public (bool isSuccess, string roleName, string fullName, int? userId) ValidateUser(string login, string password)
         {
             using (var conn = DatabaseHelper.GetConnection())
@@ -18,7 +19,7 @@ namespace DemoExamRyzhov.Model
                 {
                     conn.Open();
 
-                    // Запрос соединяет пользователей с их ролями
+                    // Соединяет пользователей с их ролями
                     string query = @"
                         SELECT u.id, u.full_name, r.role_name 
                         FROM users u
@@ -27,7 +28,6 @@ namespace DemoExamRyzhov.Model
 
                     using (var cmd = new NpgsqlCommand(query, conn))
                     {
-                        // Защита от SQL-инъекций через параметры
                         cmd.Parameters.AddWithValue("login", login);
                         cmd.Parameters.AddWithValue("password", password);
 
@@ -46,10 +46,10 @@ namespace DemoExamRyzhov.Model
                 }
                 catch (Exception ex)
                 {
-                    // Если база упала, выведем ошибку (на экзе это спасет нервы)
-                    System.Windows.Forms.MessageBox.Show("Ошибка БД: " + ex.Message);
+                    MessageBox.Show("Ошибка БД: " + ex.Message, "Критическая ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+
             return (false, null, null, null);
         }
     }

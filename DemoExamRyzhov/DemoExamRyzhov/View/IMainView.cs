@@ -23,17 +23,17 @@ namespace DemoExamRyzhov.View
         event EventHandler EditProductClicked;
         event EventHandler DeleteProductClicked;
 
-        // СОБЫТИЯ ЗАКАЗОВ
+        // События заказов
         event EventHandler AddOrderClicked;
         event EventHandler EditOrderClicked;
         event EventHandler DeleteOrderClicked;
 
-        // СОБЫТИЯ ПУНКТОВ ВЫДАЧИ
+        // События ПВЗ
         event EventHandler AddPointClicked;
         event EventHandler EditPointClicked;
         event EventHandler DeletePointClicked;
 
-        // СОБЫТИЯ ПОЛЬЗОВАТЕЛЕЙ
+        // События пользователей
         event EventHandler AddUserClicked;
         event EventHandler EditUserClicked;
         event EventHandler DeleteUserClicked;

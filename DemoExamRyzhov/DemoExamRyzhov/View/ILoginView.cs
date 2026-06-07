@@ -8,11 +8,11 @@ namespace DemoExamRyzhov.View
 {
     public interface ILoginView
     {
-        // Пропсы (свойства), чтобы презентер мог забрать текст из полей ввода
+        // Свойства для презентора
         string LoginText { get; }
         string PasswordText { get; }
 
-        // События, на которые презентер будет подписываться
+        // События
         event EventHandler LoginClicked;
         event EventHandler GuestClicked;
 

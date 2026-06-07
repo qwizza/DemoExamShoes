@@ -2,41 +2,44 @@
 using DemoExamRyzhov.View;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DemoExamRyzhov
 {
     public partial class MainForm : Form, IMainView
     {
+        // Поля фильтрации и поиска
         public string SearchText => txtSearch.Text;
         public string SelectedCategory => cmbCategory.SelectedItem?.ToString();
         public string SelectedManufacturer => cmbManufacturer.SelectedItem?.ToString();
         public string SelectedSort => cmbSort.SelectedItem?.ToString();
 
-        // Реализация всех событий интерфейса
+        // События интерфейса
         public event EventHandler FilterChanged;
+
+        // Товары
         public event EventHandler AddProductClicked;
         public event EventHandler EditProductClicked;
         public event EventHandler DeleteProductClicked;
 
+        // Заказы
         public event EventHandler AddOrderClicked;
         public event EventHandler EditOrderClicked;
         public event EventHandler DeleteOrderClicked;
 
+        // ПВЗ
         public event EventHandler AddPointClicked;
         public event EventHandler EditPointClicked;
         public event EventHandler DeletePointClicked;
 
+        // Пользователи
         public event EventHandler AddUserClicked;
         public event EventHandler EditUserClicked;
         public event EventHandler DeleteUserClicked;
 
+        // конструктор и события 
         public MainForm()
         {
             InitializeComponent();
@@ -48,27 +51,28 @@ namespace DemoExamRyzhov
             cmbManufacturer.SelectedIndexChanged += (s, e) => FilterChanged?.Invoke(this, EventArgs.Empty);
             cmbSort.SelectedIndexChanged += (s, e) => FilterChanged?.Invoke(this, EventArgs.Empty);
 
-            // Обработчики Кнопок ТОВАРОВ
+            // Обработчики кнопок товаров
             btnAddProduct.Click += (s, e) => AddProductClicked?.Invoke(this, EventArgs.Empty);
             btnEditProduct.Click += (s, e) => EditProductClicked?.Invoke(this, EventArgs.Empty);
             btnDeleteProduct.Click += (s, e) => DeleteProductClicked?.Invoke(this, EventArgs.Empty);
 
-            // Обработчики Кнопок ЗАКАЗОВ
+            // Обработчики кнопок заказов
             btnAddOrder.Click += (s, e) => AddOrderClicked?.Invoke(this, EventArgs.Empty);
             btnEditOrder.Click += (s, e) => EditOrderClicked?.Invoke(this, EventArgs.Empty);
             btnDeleteOrder.Click += (s, e) => DeleteOrderClicked?.Invoke(this, EventArgs.Empty);
 
-            // Обработчики Кнопок ПУНКТОВ ВЫДАЧИ
+            // Обработчики кнопок пвз
             btnAddPoint.Click += (s, e) => AddPointClicked?.Invoke(this, EventArgs.Empty);
             btnEditPoint.Click += (s, e) => EditPointClicked?.Invoke(this, EventArgs.Empty);
             btnDeletePoint.Click += (s, e) => DeletePointClicked?.Invoke(this, EventArgs.Empty);
 
-            // Обработчики Кнопок ПОЛЬЗОВАТЕЛЕЙ
+            // Обработчики Кнопок пользователей
             btnAddUser.Click += (s, e) => AddUserClicked?.Invoke(this, EventArgs.Empty);
             btnEditUser.Click += (s, e) => EditUserClicked?.Invoke(this, EventArgs.Empty);
             btnDeleteUser.Click += (s, e) => DeleteUserClicked?.Invoke(this, EventArgs.Empty);
         }
 
+        // Оформление по тз 
         private void ApplyStyleGuide()
         {
             this.Text = "Главное окно системы — ООО «Обувь»";
@@ -80,7 +84,6 @@ namespace DemoExamRyzhov
 
             panelHeader.BackColor = ColorTranslator.FromHtml("#7FFF00");
 
-            // Красим ВСЕ целевые кнопки "Добавить" в цвет #00FA9A и задаем плоский стиль
             Color targetColor = ColorTranslator.FromHtml("#00FA9A");
 
             btnAddProduct.BackColor = targetColor; btnAddProduct.FlatStyle = FlatStyle.Flat;
@@ -106,56 +109,46 @@ namespace DemoExamRyzhov
             this.WindowState = FormWindowState.Maximized;
         }
 
+        // Ограничение прав по ролчм
         public void ApplyAccessRights(UserRole role)
         {
-            // По умолчанию включаем отображение фильтров (для тех, кому они нужны)
             panelFilters.Visible = true;
 
-            // 1. ГОСТЬ и АВТОРИЗОВАННЫЙ ПОЛЬЗОВАТЕЛЬ (КЛИЕНТ)
+            // для готя и авторизованного пользователя
             if (role == UserRole.Guest || role == UserRole.Client)
             {
-                // Отключаем фильтры (если гостю они не нужны, как было в твоем коде)
                 panelFilters.Visible = false;
 
-                // Прячем абсолютно все панели с кнопками Добавить/Удалить/Изменить
                 panelCRUDProducts.Visible = false;
                 panelCRUDOrders.Visible = false;
                 panelCRUDPoints.Visible = false;
                 panelCRUDUsers.Visible = false;
 
-                // Удаляем все вкладки, кроме Товаров
                 if (tabControl.TabPages.Contains(tabOrders)) tabControl.TabPages.Remove(tabOrders);
                 if (tabControl.TabPages.Contains(tabPoints)) tabControl.TabPages.Remove(tabPoints);
                 if (tabControl.TabPages.Contains(tabUsers)) tabControl.TabPages.Remove(tabUsers);
             }
-            // 2. МЕНЕДЖЕР
+            // для менеджера
             else if (role == UserRole.Manager)
             {
-                // Менеджеру доступны кнопки управления для разрешенных вкладок
                 panelCRUDProducts.Visible = true;
                 panelCRUDOrders.Visible = true;
                 panelCRUDPoints.Visible = true;
-
-                // Панель кнопок пользователей прячем
                 panelCRUDUsers.Visible = false;
 
-                // Удаляем только вкладку Пользователи (Вкладка Пункты выдачи "tabPoints" ТЕПЕРЬ ОСТАЕТСЯ)
                 if (tabControl.TabPages.Contains(tabUsers)) tabControl.TabPages.Remove(tabUsers);
             }
-            // 3. АДМИНИСТРАТОР
+            // для админа
             else if (role == UserRole.Admin)
             {
-                // Администратору доступно абсолютно всё
                 panelCRUDProducts.Visible = true;
                 panelCRUDOrders.Visible = true;
                 panelCRUDPoints.Visible = true;
                 panelCRUDUsers.Visible = true;
-
-                // Проверяем, чтобы вкладки были на месте (если форма пересоздается)
-                // Если вкладки не удалялись динамически приложением ранее, этот блок сработает по умолчанию
             }
         }
 
+        // Метод заполнения данных и интерфейса с переводом названи столбцов
         public void FillFilterComboboxes(List<string> categories, List<string> manufacturers)
         {
             cmbCategory.DataSource = categories;
@@ -166,7 +159,6 @@ namespace DemoExamRyzhov
         {
             dgvProducts.DataSource = dt;
 
-            // Переименовываем столбцы для пользователя, но для C# имена остаются прежними
             if (dgvProducts.Columns["article"] != null) dgvProducts.Columns["article"].HeaderText = "Артикул";
             if (dgvProducts.Columns["name"] != null) dgvProducts.Columns["name"].HeaderText = "Наименование";
             if (dgvProducts.Columns["unit"] != null) dgvProducts.Columns["unit"].HeaderText = "Ед. измерения";
@@ -178,7 +170,7 @@ namespace DemoExamRyzhov
             if (dgvProducts.Columns["stock"] != null) dgvProducts.Columns["stock"].HeaderText = "Кол-во на складе";
             if (dgvProducts.Columns["description"] != null) dgvProducts.Columns["description"].HeaderText = "Описание";
 
-            HighlightDiscounts(); // Твой метод подсветки сработает идеально, т.к. Cells["discount"] остался на английском
+            HighlightDiscounts();
         }
 
         public void SetOrders(DataTable dt)
@@ -213,6 +205,7 @@ namespace DemoExamRyzhov
 
         public void ShowMessage(string message) => MessageBox.Show(message, "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+        // Подстветка строк при скидке больше 15
         private void HighlightDiscounts()
         {
             foreach (DataGridViewRow row in dgvProducts.Rows)
@@ -228,7 +221,5 @@ namespace DemoExamRyzhov
                 }
             }
         }
-
-
     }
 }

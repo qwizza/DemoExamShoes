@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DemoExamRyzhov.View
 {
     public partial class PointForm : Form
     {
-        // Свойство для получения введенного адреса
+        // свойства
         public string AddressText => txtAddress.Text;
-
-        // Переменная, хранящая ID редактируемой записи (если null — значит это добавление)
         private int? _pointId = null;
 
-        // Конструктор для ДОБАВЛЕНИЯ
+        // Конструктор для добавления
         public PointForm()
         {
             InitializeComponent();
@@ -26,7 +17,7 @@ namespace DemoExamRyzhov.View
             btnSave.Text = "Добавить";
         }
 
-        // Конструктор для РЕДАКТИРОВАНИЯ (принимает старые данные)
+        // Конструктор для редактирования
         public PointForm(int id, string currentAddress) : this()
         {
             _pointId = id;
@@ -35,6 +26,7 @@ namespace DemoExamRyzhov.View
             btnSave.Text = "Сохранить";
         }
 
+        // обработчик событий
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtAddress.Text))
@@ -43,7 +35,6 @@ namespace DemoExamRyzhov.View
                 return;
             }
 
-            // Говорим главной форме, что всё прошло успешно, и закрываемся
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

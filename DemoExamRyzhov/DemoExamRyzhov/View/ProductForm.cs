@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace DemoExamRyzhov.View
 {
     public partial class ProductForm : Form
     {
-        // Пропсы для чтения данных из формы презентером
+        // свойства для презентора
         public string ArticleText => txtArticle.Text;
         public string NameText => txtName.Text;
         public string UnitText => txtUnit.Text;
@@ -27,23 +21,25 @@ namespace DemoExamRyzhov.View
 
         private bool _isEditMode = false;
 
-        // Конструктор для ДОБАВЛЕНИЯ
+        // Конструктор для добавления
         public ProductForm(List<string> categories, List<string> manufacturers)
         {
             InitializeComponent();
             LoadLists(categories, manufacturers);
+
             this.Text = "Добавить новый товар";
             btnSave.Text = "Добавить";
             _isEditMode = false;
         }
 
-        // Конструктор для РЕДАКТИРОВАНИЯ
-        public ProductForm(System.Data.DataRow row, List<string> categories, List<string> manufacturers) : this(categories, manufacturers)
+        // Конструктор для редактирования
+        public ProductForm(DataRow row, List<string> categories, List<string> manufacturers)
+            : this(categories, manufacturers)
         {
             _isEditMode = true;
-            txtArticle.ReadOnly = true; // Артикул — ПК, его менять нельзя
+            txtArticle.ReadOnly = true;
 
-            // Заполняем поля старыми данными из строки DataRow
+            // Заполнения полей старыми данными
             txtArticle.Text = row["article"].ToString();
             txtName.Text = row["name"].ToString();
             txtUnit.Text = row["unit"].ToString();
@@ -59,24 +55,29 @@ namespace DemoExamRyzhov.View
             btnSave.Text = "Сохранить";
         }
 
+        // Метод загрузки
         private void LoadLists(List<string> categories, List<string> manufacturers)
         {
             cmbCategory.Items.Clear();
             cmbManufacturer.Items.Clear();
 
-            // Исключаем "Все...", которые нужны были только для фильтров
-            foreach (var cat in categories) if (cat != "Все категории") cmbCategory.Items.Add(cat);
-            foreach (var man in manufacturers) if (man != "Все производители") cmbManufacturer.Items.Add(man);
+            foreach (var cat in categories)
+                if (cat != "Все категории") cmbCategory.Items.Add(cat);
+
+            foreach (var man in manufacturers)
+                if (man != "Все производители") cmbManufacturer.Items.Add(man);
 
             if (cmbCategory.Items.Count > 0) cmbCategory.SelectedIndex = 0;
             if (cmbManufacturer.Items.Count > 0) cmbManufacturer.SelectedIndex = 0;
         }
 
+        // Обработчик событий
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtArticle.Text) || string.IsNullOrWhiteSpace(txtName.Text))
             {
-                MessageBox.Show("Артикул и Название товара обязательны для заполнения!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Артикул и Название товара обязательны для заполнения!",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
